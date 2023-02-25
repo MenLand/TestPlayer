@@ -3,7 +3,7 @@
 }
 
 :root {
-	--animation-duration: 0;
+	--video-width: 0;
 }
 
 body {
@@ -27,10 +27,7 @@ body {
 
 			&::after {
 				content: '';
-				animation-name: pagination;
-				animation-duration: var(--animation-duration);
-				animation-timing-function: linear;
-				animation-fill-mode: forwards;
+				width: var(--video-width);
 				background-color: white;
 				position: absolute;
 				height: 100%;
@@ -61,20 +58,37 @@ body {
 	}
 }
 
+.slider-next {
+	cursor: pointer;
+	z-index: 1;
+	width: 20vw;
+	height: 80%;
+	right: 10px;
+	position: absolute;
+	top: 50%;
+	opacity: 0.2;
+	background-color: black;
+	transform: translateY(-50%);
+}
+
+.slider-prev {
+	cursor: pointer;
+	z-index: 1;
+	width: 20vw;
+	height: 80%;
+	left: 10px;
+	position: absolute;
+	top: 50%;
+	opacity: 0.2;
+	background-color: black;
+	transform: translateY(-50%);
+}
+
 .slider-slide {
 	&__video {
 		object-fit: cover;
 		width: 100%;
 		height: 100%;
-	}
-}
-
-@keyframes pagination {
-	from {
-		width: 0;
-	}
-	to {
-		width: 100%;
 	}
 }
 

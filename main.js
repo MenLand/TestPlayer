@@ -1,52 +1,54 @@
 $(async () => {
 	const $videos = $('.slider__wrapper .slider-slide video');
 
-	await Promise.all(
-		$videos.map(function () {
-			return new Promise((res) => {
-				$(this).on('loadedmetadata', res);
-			});
-		})
-	);
-
-	$videos.each(function () {
-		$(this)
-			.parent()
-			.attr('data-swiper-autoplay', this.duration * 1000);
-	});
-
 	const swiper = new Swiper('.swiper', {
 		pagination: {
 			el: '.swiper-pagination',
 			clickable: true,
 		},
-		allowTouchMove: false,
-
-		autoplay: {
-			disableOnInteraction: false,
+		navigation: {
+			nextEl: '.slider-next',
+			prevEl: '.slider-prev',
 		},
-		loop: true,
+		allowTouchMove: false,
 		on: {
 			init: ({ realIndex }) => {
-				const animationTime = $videos[realIndex].duration + 's';
-				$('html')
-					.get(0)
-					.style.setProperty('--animation-duration', animationTime);
+				$videos[realIndex].play();
+
+				$($videos[realIndex]).on('timeupdate', ({ target }) => {
+					updateVideoProgressLine(target);
+				});
+
+				$($videos[realIndex]).one('ended', () => {
+					$($videos[realIndex]).off('timeupdate');
+					swiper.slideNext();
+				});
 			},
 		},
 	});
 
+	const updateVideoProgressLine = ({ duration, currentTime }) => {
+		const percentage = `${(currentTime / duration) * 100}%`;
+		$('html').get(0).style.setProperty('--video-width', percentage);
+	};
+
 	swiper.on('activeIndexChange', ({ realIndex }) => {
+		$('html').get(0).style.setProperty('--video-width', 0);
 		$videos.each(function () {
+			$(this).off('timeupdate,ended');
 			this.currentTime = 0;
 			this.pause();
 		});
-
 		$videos[realIndex].play();
-		const animationTime = $videos[realIndex].duration + 's';
-		$('html')
-			.get(0)
-			.style.setProperty('--animation-duration', animationTime);
+
+		$($videos[realIndex]).on('timeupdate', ({ target }) => {
+			updateVideoProgressLine(target);
+		});
+
+		$($videos[realIndex]).one('ended', () => {
+			$($videos[realIndex]).off('timeupdate');
+			swiper.slideNext();
+		});
 	});
 
 	$('.sound').click(() => {
